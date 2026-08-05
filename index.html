@@ -435,16 +435,17 @@ const WORLD_COLOR_OVERRIDES = {
 // ---------- TOWER TYPES ----------
 const TOWER_TYPES = {
   gunner:     { name:'Atirador',      desc:'Rápido, dano baixo', cost:100, damage:12, range:110, fireRate:2.2, color:'#3d8bff', projSpeed:480 },
-  machinegun: { name:'Metralhadora',  desc:'Rajada muito rápida', cost:160, damage:7,  range:100, fireRate:5.0, color:'#ffd23d', projSpeed:520 },
-  freezer:    { name:'Congelador',    desc:'Retarda inimigos', cost:200, damage:4,  range:105, fireRate:1.3, color:'#3ddce0', projSpeed:500, slow:0.5, slowTime:1.6 },
-  poison:     { name:'Veneno',        desc:'Dano contínuo, ignora blindagem', cost:230, damage:4, range:105, fireRate:1.1, color:'#7fff5a', projSpeed:430, poison:9, poisonTime:3 },
   sniper:     { name:'Sniper',        desc:'Longo alcance, alto dano', cost:260, damage:62, range:235, fireRate:0.75, color:'#b04dff', projSpeed:800 },
-  cannon:     { name:'Canhão',        desc:'Dano em área', cost:310, damage:38, range:135, fireRate:0.9,  color:'#ff7a3d', projSpeed:320, splash:60, projRadius:6 },
-  tesla:      { name:'Elétrica',      desc:'Salta entre inimigos', cost:360, damage:22, range:120, fireRate:1.0, color:'#8fd9ff', projSpeed:950, chain:3, chainRange:85 },
-  missile:    { name:'Lança-Mísseis', desc:'Dano massivo em área', cost:480, damage:95, range:165, fireRate:0.42, color:'#ff3d3d', projSpeed:260, splash:95, projRadius:7 },
-  axe:        { name:'Exterminador',  desc:'Machado: dano altíssimo em área, lento, alcance curto', cost:320, damage:150, range:90, fireRate:0.42, color:'#ffb020', projSpeed:650, splash:75, projRadius:8, locked:true, free:true, unlockHint:'Zere a Floresta' },
-  robot:      { name:'Robô',          desc:'Laser: aplica lentidão e veneno, dano baixo', cost:280, damage:6, range:135, fireRate:1.1, color:'#66e0ff', projSpeed:750, slow:0.55, slowTime:1.4, poison:6, poisonTime:2.5, locked:true, free:true, unlockHint:'Zere a Lava' },
+  machinegun: { name:'Metralhadora',  desc:'Rajada muito rápida', cost:160, damage:7,  range:100, fireRate:5.0, color:'#ffd23d', projSpeed:520, locked:true, coinCost:120, unlockHint:'🛒 Compre na Loja — 120 moedas' },
+  freezer:    { name:'Congelador',    desc:'Retarda inimigos', cost:200, damage:4,  range:105, fireRate:1.3, color:'#3ddce0', projSpeed:500, slow:0.5, slowTime:1.6, locked:true, coinCost:160, unlockHint:'🛒 Compre na Loja — 160 moedas' },
+  poison:     { name:'Veneno',        desc:'Dano contínuo, ignora blindagem', cost:230, damage:4, range:105, fireRate:1.1, color:'#7fff5a', projSpeed:430, poison:9, poisonTime:3, locked:true, coinCost:200, unlockHint:'🛒 Compre na Loja — 200 moedas' },
+  cannon:     { name:'Canhão',        desc:'Dano em área', cost:310, damage:38, range:135, fireRate:0.9,  color:'#ff7a3d', projSpeed:320, splash:60, projRadius:6, locked:true, coinCost:260, unlockHint:'🛒 Compre na Loja — 260 moedas' },
+  tesla:      { name:'Elétrica',      desc:'Salta entre inimigos', cost:360, damage:22, range:120, fireRate:1.0, color:'#8fd9ff', projSpeed:950, chain:3, chainRange:85, locked:true, coinCost:340, unlockHint:'🛒 Compre na Loja — 340 moedas' },
+  missile:    { name:'Lança-Mísseis', desc:'Dano massivo em área', cost:480, damage:95, range:165, fireRate:0.42, color:'#ff3d3d', projSpeed:260, splash:95, projRadius:7, locked:true, coinCost:460, unlockHint:'🛒 Compre na Loja — 460 moedas' },
+  axe:        { name:'Exterminador',  desc:'Machado: dano altíssimo em área, lento, alcance curto', cost:320, damage:150, range:90, fireRate:0.42, color:'#ffb020', projSpeed:650, splash:75, projRadius:8, locked:true, free:true, unlockHint:'🏆 Zere a Floresta' },
+  robot:      { name:'Robô',          desc:'Laser: aplica lentidão e veneno, dano baixo', cost:280, damage:6, range:135, fireRate:1.1, color:'#66e0ff', projSpeed:750, slow:0.55, slowTime:1.4, poison:6, poisonTime:2.5, locked:true, free:true, unlockHint:'🏆 Zere a Lava' },
 };
+const SHOP_TOWER_KEYS = ['machinegun','freezer','poison','cannon','tesla','missile'];
 
 // ---------- ENEMY TYPES ----------
 const ENEMY_TYPES = {
@@ -475,6 +476,7 @@ const META_KEY = 'ctd_meta_v1';
 const LAST_WORLD_KEY = 'ctd_last_world_v1';
 function defaultMeta(){
   return {
+    coins: 0,
     unlockedWorlds: ['floresta'],
     unlockedTowers: [],
     worldProgress: {
@@ -492,6 +494,7 @@ function loadMeta(){
     const data = JSON.parse(raw);
     const base = defaultMeta();
     return Object.assign(base, data, {
+      coins: typeof data.coins === 'number' ? data.coins : base.coins,
       unlockedWorlds: data.unlockedWorlds || base.unlockedWorlds,
       unlockedTowers: data.unlockedTowers || base.unlockedTowers,
       worldProgress: Object.assign(base.worldProgress, data.worldProgress || {}),
@@ -500,11 +503,21 @@ function loadMeta(){
 }
 function saveMeta(){
   try{ localStorage.setItem(META_KEY, JSON.stringify(meta)); }catch(e){}
+  updateCoinDisplays();
 }
 function isTowerUnlocked(key){
   const t = TOWER_TYPES[key];
   return !t.locked || meta.unlockedTowers.includes(key);
 }
+function updateCoinDisplays(){
+  const topbarEl = document.getElementById('coinVal');
+  if(topbarEl) topbarEl.textContent = meta.coins;
+  const shopEl = document.getElementById('shopCoinVal');
+  if(shopEl) shopEl.textContent = meta.coins;
+  const startEl = document.getElementById('startCoinVal');
+  if(startEl) startEl.textContent = meta.coins;
+}
+
 
 // ---------- GAME STATE ----------
 let state = {
@@ -1754,4 +1767,3 @@ window.addEventListener('beforeunload', () => { if(!state.gameOver) saveGame(); 
 </script>
 </body>
 </html>
-
