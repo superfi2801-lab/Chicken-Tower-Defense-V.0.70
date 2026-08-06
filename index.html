@@ -77,6 +77,7 @@
   }
   .stat .ic{font-size:17px;}
   .stat.money{color:var(--accent-green);}
+  .stat.coin{color:#ffd23d;}
   .stat.wave{color:var(--accent-blue);}
   .stat.record{color:var(--accent-gold);}
   .stat.world{color:#ff9ed6;}
@@ -144,6 +145,25 @@
     flex:0 0 auto;
   }
   canvas{display:block;background:#0f1b12;}
+
+  .fieldPanel{
+    position:absolute;
+    width:220px;
+    background:var(--bg-panel);
+    border:2px solid var(--accent-gold);
+    border-radius:12px;
+    padding:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.55);
+    z-index:20;
+    max-height:280px;
+    overflow-y:auto;
+  }
+  .fieldPanel.hidden{display:none;}
+  .fpClose{
+    position:sticky;top:0;float:right;margin-top:-6px;margin-right:-6px;
+    background:var(--bg-panel-2);border:1px solid var(--border);border-radius:50%;
+    width:22px;height:22px;color:var(--text-main);font-size:12px;cursor:pointer;
+  }
 
   #overlayMsg{
     position:absolute;
@@ -244,6 +264,7 @@
     display:flex; align-items:center; justify-content:center;
     z-index:200;
     padding:16px;
+    overflow-y:auto;
   }
   .modalOverlay.hidden{display:none;}
   .modalCard{
@@ -253,13 +274,16 @@
     padding:26px;
     max-width:680px;
     width:100%;
+    max-height:88vh;
+    overflow-y:auto;
     text-align:center;
     box-shadow:0 20px 50px rgba(0,0,0,0.5);
     position:relative;
+    margin:auto;
   }
   .modalCard h2{margin:0 0 4px;color:var(--accent-gold);font-size:22px;}
   .modalCard .sub{color:var(--text-dim);font-size:12px;margin-bottom:18px;}
-  #closeWorldSelect{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer;}
+  .modalClose{position:sticky;top:0;float:right;margin-top:-10px;margin-right:-10px;background:var(--bg-panel-2);border:1px solid var(--border);border-radius:50%;width:30px;height:30px;color:var(--text-main);font-size:15px;cursor:pointer;z-index:5;}
   #worldCards{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
   .worldCard{
     width:190px;
@@ -285,6 +309,36 @@
   .worldCard.locked .wbtn{background:#2a3040;color:var(--text-dim);cursor:not-allowed;}
   .worldCard .cleared{color:var(--accent-green);font-weight:700;font-size:11px;}
 
+  /* Start screen */
+  .startCard{max-width:460px;}
+  .startTitle{
+    font-size:26px;margin:4px 0 2px;
+    background:linear-gradient(90deg,var(--accent-gold),#ffe27a);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .startCoinRow{
+    font-size:15px;font-weight:700;color:#ffd23d;
+    background:var(--bg-panel-2);border:1px solid var(--border);
+    border-radius:10px;padding:8px 14px;margin:12px auto;display:inline-block;
+  }
+  .startButtons{display:flex;gap:12px;justify-content:center;margin-top:10px;}
+  .bigBtn{padding:14px 26px;font-size:15px;border-radius:12px;}
+
+  /* Shop */
+  #shopCards{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:10px;}
+  .shopCard{
+    width:200px;background:var(--bg-panel-2);border:2px solid var(--border);
+    border-radius:14px;padding:14px;text-align:center;
+  }
+  .shopCard .dot{width:38px;height:38px;border-radius:50%;margin:0 auto 8px;box-shadow:0 0 12px currentColor inset;border:2px solid rgba(255,255,255,0.4);}
+  .shopCard .name{font-weight:800;font-size:14px;margin-bottom:2px;}
+  .shopCard .desc{font-size:11px;color:var(--text-dim);min-height:32px;margin-bottom:8px;}
+  .shopCard .price{font-weight:800;color:#ffd23d;font-size:13px;margin-bottom:8px;}
+  .shopCard button{width:100%;border:none;border-radius:8px;padding:9px;font-weight:700;font-size:12px;cursor:pointer;background:var(--accent-gold);color:#0a0e17;}
+  .shopCard button:disabled{background:#2a3040;color:var(--text-dim);cursor:not-allowed;}
+  .shopCard.owned{border-color:var(--accent-green);}
+  .shopCard .owned-tag{color:var(--accent-green);font-weight:700;font-size:12px;}
+
   @media(max-width:820px){
     #sidebar{width:100%;}
     #canvasWrap canvas{width:100%;height:auto;}
@@ -299,7 +353,9 @@
 
   <div id="topbar">
     <div class="stat world"><span class="ic" id="worldIcon">🌲</span><span id="worldVal">Floresta</span></div>
+    <div class="stat diff" id="diffStat"><span class="ic" id="diffIcon">😐</span><span id="diffVal">Médio</span></div>
     <div class="stat money"><span class="ic">💰</span><span id="moneyVal">400</span></div>
+    <div class="stat coin"><span class="ic">🪙</span><span id="coinVal">0</span></div>
     <div class="stat wave"><span class="ic">🌊</span><span id="waveVal">Onda 0/30</span></div>
     <div class="stat record"><span class="ic">🏆</span><span id="recordVal">Recorde: 0</span></div>
     <div id="healthWrap">
@@ -307,6 +363,8 @@
       <div id="healthBarOuter"><div id="healthBarInner"></div></div>
     </div>
     <button class="btn pink" id="worldsBtn">🗺️ Mundos</button>
+    <button class="btn ghost" id="shopBtn">🛒 Loja</button>
+    <button class="btn ghost" id="homeBtn">🏠 Início</button>
     <button class="btn gold" id="startWaveBtn">▶ Iniciar Onda</button>
     <button class="btn ghost" id="autoWaveBtn">🔄 Auto: ON</button>
     <button class="btn ghost" id="speedBtn">⏩ 1x</button>
@@ -318,6 +376,10 @@
   <div id="main">
     <div id="canvasWrap">
       <canvas id="gameCanvas" width="750" height="500"></canvas>
+      <div id="towerFieldPanel" class="fieldPanel hidden">
+        <button id="closeFieldPanel" class="fpClose">✕</button>
+        <div id="towerInfo"></div>
+      </div>
       <div id="overlayMsg" class="hidden">
         <h2 id="overlayTitle">Fim de Jogo</h2>
         <p id="overlayText">A base caiu.</p>
@@ -335,31 +397,57 @@
       </div>
 
       <div class="panel">
-        <h3>Torre Selecionada</h3>
-        <div id="towerInfo"></div>
-        <div id="noSelection">Clique em uma torre no campo para ver detalhes, ou escolha uma acima para posicionar.</div>
-      </div>
-
-      <div class="panel">
         <h3>Onda</h3>
         <div id="waveInfo">Carregando...</div>
       </div>
     </div>
   </div>
 
-  <footer>Clique em uma torre da loja e depois em uma célula livre do mapa para posicioná-la. Zere um mundo (onda 30) para desbloquear o próximo mundo e uma torre exclusiva de recompensa. Seu progresso é salvo automaticamente no navegador.</footer>
+  <footer>Clique em uma torre da loja e depois em uma célula livre do mapa para posicioná-la. Clique em uma torre já posicionada no mapa para ver detalhes e upgrades. Zere um mundo (onda 30) para desbloquear o próximo mundo e uma torre exclusiva de recompensa. Seu progresso é salvo automaticamente no navegador.</footer>
 </div>
 
 <div id="worldSelectOverlay" class="modalOverlay hidden">
   <div class="modalCard">
-    <button id="closeWorldSelect">✕</button>
+    <button id="closeWorldSelect" class="modalClose">✕</button>
     <h2>🗺️ Escolha seu Mundo</h2>
     <div class="sub">Cada mundo tem 30 ondas, inimigos exclusivos e um chefão final. Zere um mundo para desbloquear o próximo!</div>
     <div id="worldCards"></div>
   </div>
 </div>
 
+<div id="difficultyOverlay" class="modalOverlay hidden">
+  <div class="modalCard">
+    <button id="closeDifficulty" class="modalClose">✕</button>
+    <h2>⚔️ Escolha a Dificuldade</h2>
+    <div class="sub">O modo Extreme só está disponível na Floresta: galinhas roxas, muito mais rápidas e resistentes. Vença-o para ganhar a torre Extremer!</div>
+    <div id="difficultyCards"></div>
+  </div>
+</div>
+
+<div id="startScreen" class="modalOverlay">
+  <div class="modalCard startCard">
+    <h1 class="startTitle">🐔 CHICKEN TOWER DEFENSE</h1>
+    <div class="sub">Defenda a base contra ondas de galinhas em 3 mundos diferentes!</div>
+    <div class="startCoinRow">🪙 Moedas: <b id="startCoinVal">0</b></div>
+    <div class="startButtons">
+      <button class="btn gold bigBtn" id="playBtn">▶ Jogar</button>
+      <button class="btn pink bigBtn" id="shopBtnStart">🛒 Loja</button>
+    </div>
+  </div>
+</div>
+
+<div id="shopOverlay" class="modalOverlay hidden">
+  <div class="modalCard">
+    <button id="closeShop" class="modalClose">✕</button>
+    <h2>🛒 Loja de Torres</h2>
+    <div class="sub">Compre novas torres permanentemente com moedas ganhas jogando. Atirador e Sniper já vêm liberados.</div>
+    <div class="startCoinRow">🪙 Moedas: <b id="shopCoinVal">0</b></div>
+    <div id="shopCards"></div>
+  </div>
+</div>
+
 <script>
+
 (function(){
 "use strict";
 
@@ -442,10 +530,12 @@ const TOWER_TYPES = {
   cannon:     { name:'Canhão',        desc:'Dano em área', cost:310, damage:38, range:135, fireRate:0.9,  color:'#ff7a3d', projSpeed:320, splash:60, projRadius:6, locked:true, coinCost:260, unlockHint:'🛒 Compre na Loja — 260 moedas' },
   tesla:      { name:'Elétrica',      desc:'Salta entre inimigos', cost:360, damage:22, range:120, fireRate:1.0, color:'#8fd9ff', projSpeed:950, chain:3, chainRange:85, locked:true, coinCost:340, unlockHint:'🛒 Compre na Loja — 340 moedas' },
   missile:    { name:'Lança-Mísseis', desc:'Dano massivo em área', cost:480, damage:95, range:165, fireRate:0.42, color:'#ff3d3d', projSpeed:260, splash:95, projRadius:7, locked:true, coinCost:460, unlockHint:'🛒 Compre na Loja — 460 moedas' },
-  axe:        { name:'Exterminador',  desc:'Machado: dano altíssimo em área, lento, alcance curto', cost:320, damage:150, range:90, fireRate:0.42, color:'#ffb020', projSpeed:650, splash:75, projRadius:8, locked:true, free:true, unlockHint:'🏆 Zere a Floresta' },
-  robot:      { name:'Robô',          desc:'Laser: aplica lentidão e veneno, dano baixo', cost:280, damage:6, range:135, fireRate:1.1, color:'#66e0ff', projSpeed:750, slow:0.55, slowTime:1.4, poison:6, poisonTime:2.5, locked:true, free:true, unlockHint:'🏆 Zere a Lava' },
+  bacteria:   { name:'Bactéria',      desc:'Envia bactérias que avançam pelo lado oposto do caminho e lutam corpo a corpo', cost:500, color:'#7fff3d', locked:true, coinCost:450, unlockHint:'🛒 Compre na Loja — 450 moedas', spawner:true, spawnInterval:4.5, minionHp:45, minionDamage:16, minionSpeed:75 },
+  axe:        { name:'Exterminador',  desc:'Machado: dano altíssimo em área, lento, alcance curto', cost:400, damage:150, range:90, fireRate:0.42, color:'#ffb020', projSpeed:650, splash:75, projRadius:8, locked:true, unlockHint:'🏆 Zere a Floresta' },
+  robot:      { name:'Robô',          desc:'Laser: aplica lentidão e veneno, dano baixo', cost:300, damage:6, range:135, fireRate:1.1, color:'#66e0ff', projSpeed:750, slow:0.55, slowTime:1.4, poison:6, poisonTime:2.5, locked:true, unlockHint:'🏆 Zere a Lava' },
+  extremer:   { name:'Extremer',      desc:'Shuriken roxa: dano altíssimo, alcance longo', cost:700, damage:200, range:270, fireRate:0.8, color:'#a64dff', projSpeed:900, shuriken:true, locked:true, unlockHint:'☠️ Vença o modo Extreme (Floresta)' },
 };
-const SHOP_TOWER_KEYS = ['machinegun','freezer','poison','cannon','tesla','missile'];
+const SHOP_TOWER_KEYS = ['machinegun','freezer','poison','cannon','tesla','missile','bacteria'];
 
 // ---------- ENEMY TYPES ----------
 const ENEMY_TYPES = {
@@ -479,6 +569,7 @@ function defaultMeta(){
     coins: 0,
     unlockedWorlds: ['floresta'],
     unlockedTowers: [],
+    extremeCleared: false,
     worldProgress: {
       floresta: { highWave: 0, cleared: false },
       lava:     { highWave: 0, cleared: false },
@@ -497,6 +588,7 @@ function loadMeta(){
       coins: typeof data.coins === 'number' ? data.coins : base.coins,
       unlockedWorlds: data.unlockedWorlds || base.unlockedWorlds,
       unlockedTowers: data.unlockedTowers || base.unlockedTowers,
+      extremeCleared: !!data.extremeCleared,
       worldProgress: Object.assign(base.worldProgress, data.worldProgress || {}),
     });
   }catch(e){ return defaultMeta(); }
@@ -522,6 +614,7 @@ function updateCoinDisplays(){
 // ---------- GAME STATE ----------
 let state = {
   world: 'floresta',
+  difficulty: 'medio',
   money: 400,
   health: 100,
   maxHealth: 100,
@@ -531,6 +624,7 @@ let state = {
   enemies: [],
   projectiles: [],
   particles: [],
+  bacteriaMinions: [],
   waveActive: false,
   spawnQueue: [],
   spawnTimer: 0,
@@ -545,9 +639,16 @@ let state = {
   overlayMode: null,
 };
 
-function sessionKey(world){ return 'ctd_session_v1_' + world; }
+const DIFFICULTIES = {
+  facil:   { name:'Fácil',   icon:'🙂', desc:'Inimigos com menos vida e mais dinheiro inicial.', hpMult:0.75, speedMult:0.92, moneyMult:1.15, coinMult:0.8, color:'#3ddc84' },
+  medio:   { name:'Médio',   icon:'😐', desc:'Experiência padrão e balanceada.', hpMult:1.0, speedMult:1.0, moneyMult:1.0, coinMult:1.0, color:'#3d8bff' },
+  dificil: { name:'Difícil', icon:'😈', desc:'Inimigos mais fortes e rápidos, menos dinheiro inicial.', hpMult:1.35, speedMult:1.12, moneyMult:0.9, coinMult:1.2, color:'#ff7a3d' },
+  extreme: { name:'Extreme', icon:'☠️', desc:'Só na Floresta! Galinhas roxas, super rápidas e resistentes. Vença para ganhar a torre Extremer.', hpMult:1.9, speedMult:1.3, moneyMult:0.8, coinMult:1.6, color:'#a64dff', extremeOnly:true },
+};
 
-// ---------- SAVE / LOAD (per-world session) ----------
+function sessionKey(world, difficulty){ return 'ctd_session_v1_' + world + '_' + difficulty; }
+
+// ---------- SAVE / LOAD (per-world, per-difficulty session) ----------
 function saveGame(){
   const data = {
     money: state.money,
@@ -558,7 +659,7 @@ function saveGame(){
     towers: state.towers.map(t => ({type:t.type, gx:t.gx, gy:t.gy, level:t.level})),
     ts: Date.now(),
   };
-  try{ localStorage.setItem(sessionKey(state.world), JSON.stringify(data)); flashSaveBtn(); }catch(e){}
+  try{ localStorage.setItem(sessionKey(state.world, state.difficulty), JSON.stringify(data)); flashSaveBtn(); }catch(e){}
   meta.worldProgress[state.world].highWave = Math.max(meta.worldProgress[state.world].highWave, state.highWave);
   saveMeta();
   try{ localStorage.setItem(LAST_WORLD_KEY, state.world); }catch(e){}
@@ -569,13 +670,13 @@ function flashSaveBtn(){
   b.textContent = '✔ Salvo!';
   setTimeout(()=>{ b.textContent = old; }, 900);
 }
-function loadSession(world){
+function loadSession(world, difficulty){
   try{
-    const raw = localStorage.getItem(sessionKey(world));
+    const raw = localStorage.getItem(sessionKey(world, difficulty));
     if(!raw) return false;
     const data = JSON.parse(raw);
     const w = WORLDS[world];
-    state.money = data.money ?? 400;
+    state.money = data.money ?? Math.round(400 * DIFFICULTIES[difficulty].moneyMult);
     state.maxHealth = data.maxHealth ?? (100 + w.healthBonus);
     state.health = data.health ?? state.maxHealth;
     state.wave = data.wave ?? 0;
@@ -588,8 +689,9 @@ function loadSession(world){
 // ---------- WORLD SESSION MANAGEMENT ----------
 function freshSessionFields(world){
   const w = WORLDS[world];
+  const diff = DIFFICULTIES[state.difficulty];
   state.world = world;
-  state.money = 400;
+  state.money = Math.round(400 * diff.moneyMult);
   state.maxHealth = 100 + w.healthBonus;
   state.health = state.maxHealth;
   state.wave = 0;
@@ -598,6 +700,7 @@ function freshSessionFields(world){
   state.enemies = [];
   state.projectiles = [];
   state.particles = [];
+  state.bacteriaMinions = [];
   state.waveActive = false;
   state.spawnQueue = [];
   state.spawnTimer = 0;
@@ -608,10 +711,12 @@ function freshSessionFields(world){
   state.autoWaveTimer = 0;
 }
 function enterWorld(world){
-  const wasPaused = false;
-  const loaded = loadSession(world);
+  if(state.difficulty === 'extreme' && world !== 'floresta'){
+    state.difficulty = 'medio'; // Extreme mode only applies to the Floresta
+  }
+  const loaded = loadSession(world, state.difficulty);
   if(!loaded){ freshSessionFields(world); }
-  else { state.world = world; state.enemies=[]; state.projectiles=[]; state.particles=[]; state.waveActive=false; state.spawnQueue=[]; state.selectedShopType=null; state.selectedTower=null; state.gameOver=false; state.paused=false; state.autoWaveTimer=0; }
+  else { state.world = world; state.enemies=[]; state.projectiles=[]; state.particles=[]; state.bacteriaMinions=[]; state.waveActive=false; state.spawnQueue=[]; state.selectedShopType=null; state.selectedTower=null; state.gameOver=false; state.paused=false; state.autoWaveTimer=0; }
   document.getElementById('overlayMsg').classList.add('hidden');
   renderShop();
   renderTowerInfo();
@@ -619,7 +724,7 @@ function enterWorld(world){
   if(loaded && state.wave > 0){
     document.getElementById('waveInfo').innerHTML = `Progresso restaurado — onda <b>${state.wave}</b> concluída. Pressione <b>Iniciar Onda</b> ou aguarde a próxima automática.`;
   } else {
-    document.getElementById('waveInfo').innerHTML = `Bem-vindo à ${WORLDS[world].name}! Ondas automáticas <b>ativadas</b> — a primeira onda começa em instantes.`;
+    document.getElementById('waveInfo').innerHTML = `Bem-vindo à ${WORLDS[world].name} (${DIFFICULTIES[state.difficulty].name})! Ondas automáticas <b>ativadas</b> — a primeira onda começa em instantes.`;
   }
   if(state.autoWave && !state.waveActive && !state.gameOver){
     state.autoWaveTimer = state.autoWaveDelay;
@@ -628,10 +733,12 @@ function enterWorld(world){
 }
 
 // ---------- TOWER ----------
+let towerIdCounter = 1;
 function makeTower(type, gx, gy, level){
   level = level || 1;
   const base = TOWER_TYPES[type];
   return {
+    id: towerIdCounter++,
     type, gx, gy,
     x: gx*CELL+CELL/2, y: gy*CELL+CELL/2,
     level,
@@ -652,9 +759,9 @@ function towerStats(t){
   const base = TOWER_TYPES[t.type];
   const lvl = t.level;
   return {
-    damage: base.damage * (1 + (lvl-1)*0.55),
-    range: base.range * (1 + (lvl-1)*0.12),
-    fireRate: base.fireRate * (1 + (lvl-1)*0.18),
+    damage: (base.damage||0) * (1 + (lvl-1)*0.55),
+    range: (base.range||0) * (1 + (lvl-1)*0.12),
+    fireRate: (base.fireRate||0) * (1 + (lvl-1)*0.18),
     splash: base.splash ? base.splash * (1+(lvl-1)*0.15) : 0,
     slow: base.slow, slowTime: base.slowTime,
     poison: base.poison ? base.poison * (1 + (lvl-1)*0.4) : 0,
@@ -662,6 +769,17 @@ function towerStats(t){
     chain: base.chain ? base.chain + Math.floor((lvl-1)/3) : 0,
     chainRange: base.chainRange,
     projRadius: base.projRadius || 4,
+  };
+}
+// Bacteria-spawner scaling: each level makes spawned bacteria stronger/tankier; max level spawns 2 at once
+function minionStatsForTower(t){
+  const base = TOWER_TYPES[t.type];
+  const lvl = t.level;
+  return {
+    hp: base.minionHp * (1 + (lvl-1)*0.5),
+    damage: base.minionDamage * (1 + (lvl-1)*0.5),
+    speed: base.minionSpeed,
+    count: lvl >= 6 ? 2 : 1,
   };
 }
 
@@ -706,13 +824,17 @@ function enemyColorFor(type, world){
 
 function spawnEnemy(type){
   const world = WORLDS[state.world];
+  const diff = DIFFICULTIES[state.difficulty];
   const base = ENEMY_TYPES[type];
-  const hpScale = hpScaleForWave(state.wave) * world.hpMult;
-  const spdScale = speedScaleForWave(state.wave);
+  const hpScale = hpScaleForWave(state.wave) * world.hpMult * diff.hpMult;
+  const spdScale = speedScaleForWave(state.wave) * diff.speedMult;
   let color = enemyColorFor(type, state.world);
   let name = base.name;
   if(type === 'boss'){ color = world.bossColor; name = world.bossName; }
   if(type === 'megaboss'){ color = world.megaColor; name = world.megaName; }
+  if(state.difficulty === 'extreme'){
+    color = type === 'megaboss' ? '#4a0e8c' : (type === 'boss' ? '#7a1fd6' : '#a64dff');
+  }
 
   state.enemies.push({
     type, name, x: waypoints[0].x, y: waypoints[0].y,
@@ -751,6 +873,21 @@ function spawnProjectile(tower, target, stats){
     poison: stats.poison, poisonTime: stats.poisonTime,
     chain: stats.chain, chainRange: stats.chainRange,
     radius: stats.projRadius,
+    shuriken: !!TOWER_TYPES[tower.type].shuriken,
+  });
+}
+let bacteriaIdCounter = 1;
+function spawnBacteriaMinion(tower, mstats){
+  const start = waypoints[waypoints.length-1];
+  state.bacteriaMinions.push({
+    id: 'bm' + (bacteriaIdCounter++),
+    sourceId: tower.id,
+    x: start.x, y: start.y,
+    hp: mstats.hp, maxHp: mstats.hp,
+    damage: mstats.damage, speed: mstats.speed,
+    pathIndex: waypoints.length-1,
+    angle: Math.PI,
+    dead: false,
   });
 }
 
@@ -819,6 +956,18 @@ function update(dt){
   // towers
   for(const t of state.towers){
     t.cooldown -= dt;
+    const towerBase = TOWER_TYPES[t.type];
+    if(towerBase.spawner){
+      if(t.cooldown <= 0){
+        const mstats = minionStatsForTower(t);
+        const activeCount = state.bacteriaMinions.filter(m => m.sourceId === t.id && !m.dead).length;
+        if(activeCount < 6){
+          for(let i=0; i<mstats.count; i++) spawnBacteriaMinion(t, mstats);
+        }
+        t.cooldown = towerBase.spawnInterval;
+      }
+      continue;
+    }
     const stats = towerStats(t);
     let target = null, bestProgress = -1;
     for(const e of state.enemies){
@@ -836,6 +985,40 @@ function update(dt){
       }
     }
   }
+
+  // bacteria minions: crawl backward along the path from the far end, fighting enemies on contact
+  for(const m of state.bacteriaMinions){
+    if(m.dead) continue;
+    const nearby = state.enemies.filter(e => !e.dead && Math.hypot(e.x-m.x, e.y-m.y) <= 32);
+    if(nearby.length > 0){
+      let maxIncoming = 0;
+      for(const e of nearby){
+        const eff = Math.max(1, m.damage - (e.armor||0));
+        applyDamage(e, eff*dt);
+        if(e.dmg > maxIncoming) maxIncoming = e.dmg;
+      }
+      m.hp -= maxIncoming*dt;
+      if(m.hp <= 0){ m.dead = true; spawnBurst(m.x, m.y, '#7fff3d', 6); }
+      continue;
+    }
+    let remaining = m.speed*dt;
+    while(remaining > 0 && m.pathIndex > 0){
+      const a = waypoints[m.pathIndex], b = waypoints[m.pathIndex-1];
+      const dx=b.x-m.x, dy=b.y-m.y;
+      const distToNext = Math.hypot(dx,dy);
+      if(distToNext > 0.01) m.angle = Math.atan2(dy,dx);
+      if(distToNext <= remaining){
+        m.x = b.x; m.y = b.y; m.pathIndex--;
+        remaining -= distToNext;
+        if(m.pathIndex <= 0){ m.dead = true; break; }
+      } else {
+        const ratio = remaining/distToNext;
+        m.x += dx*ratio; m.y += dy*ratio;
+        remaining = 0;
+      }
+    }
+  }
+  state.bacteriaMinions = state.bacteriaMinions.filter(m => !m.dead);
 
   // projectiles
   for(const p of state.projectiles){
@@ -863,15 +1046,27 @@ function update(dt){
     state.money += bonus;
     addFloatText(`Onda concluída! +$${bonus}`, canvas.width/2, 40, '#3ddc84');
 
-    if(state.wave === WAVES_PER_WORLD && state.world !== 'candy' && !meta.worldProgress[state.world].cleared){
+    const coinReward = Math.round((3 + state.wave*0.6) * DIFFICULTIES[state.difficulty].coinMult);
+    meta.coins += coinReward;
+    addFloatText(`+${coinReward} 🪙`, canvas.width/2, 58, '#ffd23d');
+    saveMeta();
+
+    let handledSpecial = false;
+    if(state.wave === WAVES_PER_WORLD && state.difficulty === 'extreme' && state.world === 'floresta' && !meta.extremeCleared){
+      handleExtremeCleared();
+      handledSpecial = true;
+    } else if(state.wave === WAVES_PER_WORLD && state.world !== 'candy' && !meta.worldProgress[state.world].cleared){
       handleWorldCleared();
+      handledSpecial = true;
     } else if(state.wave === WAVES_PER_WORLD && state.world === 'candy' && !meta.worldProgress.candy.cleared){
       meta.worldProgress.candy.cleared = true;
       saveMeta();
-      addFloatText('Doce dominado! Sobrevivência infinita ativada!', canvas.width/2, 70, '#ff4da6');
+      addFloatText('Doce dominado! Sobrevivência infinita ativada!', canvas.width/2, 78, '#ff4da6');
       updateWaveInfoPanel(null, true);
       if(state.autoWave) state.autoWaveTimer = state.autoWaveDelay;
-    } else {
+      handledSpecial = true;
+    }
+    if(!handledSpecial){
       updateWaveInfoPanel(null, true);
       if(state.autoWave) state.autoWaveTimer = state.autoWaveDelay;
     }
@@ -903,6 +1098,21 @@ function handleWorldCleared(){
   }
   saveMeta();
   showWorldClearOverlay(world);
+}
+
+function handleExtremeCleared(){
+  meta.extremeCleared = true;
+  if(!meta.unlockedTowers.includes('extremer')) meta.unlockedTowers.push('extremer');
+  let alsoNormal = false;
+  const world = WORLDS.floresta;
+  if(!meta.worldProgress.floresta.cleared){
+    meta.worldProgress.floresta.cleared = true;
+    if(world.unlocksWorld && !meta.unlockedWorlds.includes(world.unlocksWorld)) meta.unlockedWorlds.push(world.unlocksWorld);
+    if(world.unlockTower && !meta.unlockedTowers.includes(world.unlockTower)) meta.unlockedTowers.push(world.unlockTower);
+    alsoNormal = true;
+  }
+  saveMeta();
+  showExtremeClearOverlay(alsoNormal);
 }
 
 function hitTarget(p){
@@ -995,7 +1205,7 @@ function triggerGameOver(){
   state.gameOver = true;
   state.overlayMode = 'gameover';
   document.getElementById('overlayTitle').textContent = '💥 Base Destruída';
-  document.getElementById('overlayText').textContent = `Você resistiu até a onda ${state.wave} em ${WORLDS[state.world].name}. Recorde neste mundo: onda ${state.highWave}.`;
+  document.getElementById('overlayText').textContent = `Você resistiu até a onda ${state.wave} em ${WORLDS[state.world].name} (${DIFFICULTIES[state.difficulty].name}). Recorde neste mundo: onda ${state.highWave}.`;
   document.getElementById('overlayBtn').textContent = '🔁 Jogar Novamente';
   document.getElementById('overlayBtn').style.display = '';
   document.getElementById('overlayWorldBtn').textContent = '🗺️ Mundos';
@@ -1005,10 +1215,22 @@ function triggerGameOver(){
 function showWorldClearOverlay(world){
   state.overlayMode = 'worldclear';
   let rewardText = '';
-  if(world.unlockTower) rewardText += `Você desbloqueou a torre <b>${TOWER_TYPES[world.unlockTower].name}</b>! `;
+  if(world.unlockTower) rewardText += `Você desbloqueou a torre <b>${TOWER_TYPES[world.unlockTower].name}</b> — agora disponível para comprar no jogo por $${TOWER_TYPES[world.unlockTower].cost}! `;
   if(world.unlocksWorld) rewardText += `O mundo <b>${WORLDS[world.unlocksWorld].name}</b> foi desbloqueado!`;
   document.getElementById('overlayTitle').textContent = `🏆 ${world.name} Concluída!`;
   document.getElementById('overlayText').innerHTML = rewardText || 'Parabéns por completar este mundo!';
+  document.getElementById('overlayBtn').style.display = 'none';
+  document.getElementById('overlayWorldBtn').textContent = '🗺️ Escolher Próximo Mundo';
+  document.getElementById('overlayMsg').classList.remove('hidden');
+}
+function showExtremeClearOverlay(alsoNormal){
+  state.overlayMode = 'worldclear';
+  let text = `Você venceu o modo <b>Extreme</b> na Floresta! Desbloqueou a torre <b>Extremer</b> (roxa, shuriken, 750 de dano no nível máximo, alcance longo) — disponível por $700.`;
+  if(alsoNormal){
+    text += ` Isso também contou como zerar a Floresta: você desbloqueou o mundo <b>Lava</b> e a torre <b>Exterminador</b>!`;
+  }
+  document.getElementById('overlayTitle').textContent = '☠️ Modo Extreme Vencido!';
+  document.getElementById('overlayText').innerHTML = text;
   document.getElementById('overlayBtn').style.display = 'none';
   document.getElementById('overlayWorldBtn').textContent = '🗺️ Escolher Próximo Mundo';
   document.getElementById('overlayMsg').classList.remove('hidden');
@@ -1058,18 +1280,20 @@ function render(){
     ctx.strokeStyle = blocked ? '#ff4d5e' : '#3ddc84';
     ctx.lineWidth = 2;
     ctx.strokeRect(gx*CELL+1, gy*CELL+1, CELL-2, CELL-2);
-    const range = TOWER_TYPES[state.selectedShopType].range;
-    ctx.beginPath();
-    ctx.arc(gx*CELL+CELL/2, gy*CELL+CELL/2, range, 0, Math.PI*2);
-    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
-    ctx.stroke();
+    if(!TOWER_TYPES[state.selectedShopType].spawner){
+      const range = TOWER_TYPES[state.selectedShopType].range;
+      ctx.beginPath();
+      ctx.arc(gx*CELL+CELL/2, gy*CELL+CELL/2, range, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+      ctx.stroke();
+    }
   }
 
   // towers
   for(const t of state.towers){
     const base = TOWER_TYPES[t.type];
     const selected = state.selectedTower === t;
-    if(selected){
+    if(selected && !base.spawner){
       const stats = towerStats(t);
       ctx.beginPath();
       ctx.arc(t.x, t.y, stats.range, 0, Math.PI*2);
@@ -1102,6 +1326,11 @@ function render(){
       ctx.arc(t.x - (t.level-1)*4 + l*8, t.y + CELL*0.34 + 7, 2.5, 0, Math.PI*2);
       ctx.fill();
     }
+  }
+
+  // bacteria minions
+  for(const m of state.bacteriaMinions){
+    drawBacteria(m);
   }
 
   // enemies
@@ -1140,10 +1369,28 @@ function render(){
 
   // projectiles
   for(const p of state.projectiles){
-    ctx.fillStyle = p.color;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.radius||4, 0, Math.PI*2);
-    ctx.fill();
+    if(p.shuriken){
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(performance.now()/70);
+      ctx.fillStyle = p.color;
+      for(let i=0;i<4;i++){
+        ctx.save();
+        ctx.rotate(i*Math.PI/2);
+        ctx.beginPath();
+        ctx.moveTo(0,0); ctx.lineTo(7,-2.5); ctx.lineTo(9,0); ctx.lineTo(7,2.5);
+        ctx.closePath(); ctx.fill();
+        ctx.restore();
+      }
+      ctx.fillStyle = '#0a0e17';
+      ctx.beginPath(); ctx.arc(0,0,2.2,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    } else {
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius||4, 0, Math.PI*2);
+      ctx.fill();
+    }
   }
 
   // particles
@@ -1299,6 +1546,34 @@ function drawWeapon(type, color){
       ctx.beginPath(); ctx.arc(L*1.0, 0, 3, 0, Math.PI*2); ctx.fill();
       break;
     }
+    case 'extremer': {
+      ctx.save();
+      ctx.translate(L*0.55, 0);
+      ctx.rotate(performance.now()/150);
+      ctx.fillStyle = color;
+      for(let i=0;i<4;i++){
+        ctx.save();
+        ctx.rotate(i*Math.PI/2);
+        ctx.beginPath();
+        ctx.moveTo(0,0); ctx.lineTo(11,-4); ctx.lineTo(15,0); ctx.lineTo(11,4);
+        ctx.closePath(); ctx.fill();
+        ctx.restore();
+      }
+      ctx.fillStyle = '#0a0e17';
+      ctx.beginPath(); ctx.arc(0,0,3.5,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+      break;
+    }
+    case 'bacteria': {
+      ctx.fillStyle = '#2b2f38';
+      ctx.beginPath(); ctx.arc(L*0.3, 0, 10, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.arc(L*0.3, 0, 7, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = shadeColor(color, -50);
+      ctx.beginPath(); ctx.arc(L*0.3-2, -2, 2.4, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(L*0.3+2, 2, 1.8, 0, Math.PI*2); ctx.fill();
+      break;
+    }
     default: {
       ctx.fillStyle = color;
       ctx.fillRect(0, -5, L, 10);
@@ -1312,6 +1587,31 @@ function shadeColor(hex, amt){
   let r = (num>>16) + amt, g = ((num>>8)&0xff) + amt, b = (num&0xff) + amt;
   r = Math.max(0,Math.min(255,r)); g = Math.max(0,Math.min(255,g)); b = Math.max(0,Math.min(255,b));
   return '#' + (r<<16|g<<8|b).toString(16).padStart(6,'0');
+}
+function drawBacteria(m){
+  const r = 10;
+  ctx.save();
+  ctx.translate(m.x, m.y);
+  ctx.rotate(m.angle);
+  const wobble = Math.sin(performance.now()/150 + m.x) * 1.5;
+  ctx.fillStyle = '#7fff3d';
+  ctx.beginPath();
+  ctx.ellipse(0, 0, r+wobble*0.3, r*0.78, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#4dcc1f';
+  ctx.beginPath(); ctx.arc(r*0.3, -r*0.25, r*0.28, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(-r*0.25, r*0.3, r*0.22, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(-r*0.35, -r*0.15, r*0.16, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.ellipse(0, 0, r+wobble*0.3, r*0.78, 0, 0, Math.PI*2); ctx.stroke();
+  ctx.restore();
+  // hp bar
+  const w = r*2;
+  ctx.fillStyle = '#000';
+  ctx.fillRect(m.x-w/2, m.y-r-9, w, 4);
+  ctx.fillStyle = '#7fff3d';
+  ctx.fillRect(m.x-w/2, m.y-r-9, w*Math.max(0,m.hp/m.maxHp), 4);
 }
 function drawChicken(e){
   const r = e.radius;
@@ -1540,37 +1840,51 @@ function updateShopAfford(){
 
 function renderTowerInfo(){
   const info = document.getElementById('towerInfo');
-  const none = document.getElementById('noSelection');
+  const panel = document.getElementById('towerFieldPanel');
   const t = state.selectedTower;
   if(!t){
     info.innerHTML = '';
-    none.style.display = 'block';
+    panel.classList.add('hidden');
     return;
   }
-  none.style.display = 'none';
   const base = TOWER_TYPES[t.type];
-  const stats = towerStats(t);
-  const upCost = upgradeCost(t.type, t.level);
-  const sellValue = Math.round(t.invested * 0.6);
   const maxLevel = t.level >= 6;
+  const upCost = maxLevel ? 0 : upgradeCost(t.type, t.level);
+  const sellValue = Math.round(t.invested * 0.6);
+
+  let statsRows;
+  if(base.spawner){
+    const mstats = minionStatsForTower(t);
+    statsRows = `
+      <div class="row"><span>Vida da bactéria</span><b>${mstats.hp.toFixed(0)}</b></div>
+      <div class="row"><span>Dano da bactéria</span><b>${mstats.damage.toFixed(0)}/seg</b></div>
+      <div class="row"><span>Intervalo de spawn</span><b>${base.spawnInterval.toFixed(1)}s</b></div>
+      <div class="row"><span>Bactérias por spawn</span><b>${mstats.count}${maxLevel ? ' (máx.)' : ''}</b></div>
+    `;
+  } else {
+    const stats = towerStats(t);
+    statsRows = `
+      <div class="row"><span>Dano</span><b>${stats.damage.toFixed(0)}</b></div>
+      <div class="row"><span>Alcance</span><b>${stats.range.toFixed(0)}</b></div>
+      <div class="row"><span>Tiros/seg</span><b>${stats.fireRate.toFixed(2)}</b></div>
+      ${base.splash ? `<div class="row"><span>Raio de explosão</span><b>${stats.splash.toFixed(0)}</b></div>` : ''}
+      ${base.slow ? `<div class="row"><span>Lentidão</span><b>${Math.round((1-base.slow)*100)}%</b></div>` : ''}
+      ${base.poison ? `<div class="row"><span>Veneno/seg</span><b>${stats.poison.toFixed(1)} (ignora blindagem)</b></div>` : ''}
+      ${base.chain ? `<div class="row"><span>Salta entre</span><b>${stats.chain} inimigos</b></div>` : ''}
+    `;
+  }
 
   info.innerHTML = `
-    <div class="row"><span>${base.name}</span><b>Nível ${t.level}</b></div>
-    <div class="row"><span>Dano</span><b>${stats.damage.toFixed(0)}</b></div>
-    <div class="row"><span>Alcance</span><b>${stats.range.toFixed(0)}</b></div>
-    <div class="row"><span>Tiros/seg</span><b>${stats.fireRate.toFixed(2)}</b></div>
-    ${base.splash ? `<div class="row"><span>Raio de explosão</span><b>${stats.splash.toFixed(0)}</b></div>` : ''}
-    ${base.slow ? `<div class="row"><span>Lentidão</span><b>${Math.round((1-base.slow)*100)}%</b></div>` : ''}
-    ${base.poison ? `<div class="row"><span>Veneno/seg</span><b>${stats.poison.toFixed(1)} (ignora blindagem)</b></div>` : ''}
-    ${base.chain ? `<div class="row"><span>Salta entre</span><b>${stats.chain} inimigos</b></div>` : ''}
+    <div class="row"><span>${base.name}</span><b>${maxLevel ? 'MAX' : 'Nível ' + t.level}</b></div>
+    ${statsRows}
     <div class="actions">
-      <button class="btn green" id="upgradeBtn" ${maxLevel || state.money<upCost ? 'disabled' : ''}>⬆ Upgrade $${upCost}</button>
+      <button class="btn green" id="upgradeBtn" ${maxLevel || state.money<upCost ? 'disabled' : ''}>${maxLevel ? 'MAX' : `⬆ Upgrade $${upCost}`}</button>
       <button class="btn red" id="sellBtn">💵 Vender $${sellValue}</button>
     </div>
   `;
   const upBtn = document.getElementById('upgradeBtn');
-  if(upBtn) upBtn.addEventListener('click', () => {
-    if(state.money < upCost || maxLevel) return;
+  if(upBtn && !maxLevel) upBtn.addEventListener('click', () => {
+    if(state.money < upCost || t.level >= 6) return;
     state.money -= upCost;
     t.invested += upCost;
     t.level++;
@@ -1580,11 +1894,40 @@ function renderTowerInfo(){
   document.getElementById('sellBtn').addEventListener('click', () => {
     state.money += sellValue;
     state.towers = state.towers.filter(x => x !== t);
+    state.bacteriaMinions = state.bacteriaMinions.filter(m => m.sourceId !== t.id);
     state.selectedTower = null;
     saveGame();
     updateShopAfford();
     renderTowerInfo();
   });
+  panel.classList.remove('hidden');
+  positionFieldPanel(t);
+}
+// Cheap per-frame refresh: just toggles the upgrade button's disabled state as money changes,
+// without rebuilding the whole panel (fixes the button staying disabled after earning money).
+function updateTowerInfoAfford(){
+  const t = state.selectedTower;
+  if(!t) return;
+  const upBtn = document.getElementById('upgradeBtn');
+  if(!upBtn) return;
+  const maxLevel = t.level >= 6;
+  if(maxLevel) return;
+  const upCost = upgradeCost(t.type, t.level);
+  upBtn.disabled = state.money < upCost;
+}
+function positionFieldPanel(t){
+  const panel = document.getElementById('towerFieldPanel');
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = rect.width / canvas.width, scaleY = rect.height / canvas.height;
+  const px = t.x * scaleX, py = t.y * scaleY;
+  const panelW = 220, panelHEstimate = 250;
+  let left = px + 26;
+  if(left + panelW > rect.width - 6) left = px - panelW - 26;
+  left = Math.max(6, Math.min(left, rect.width - panelW - 6));
+  let top = py - panelHEstimate/2;
+  top = Math.max(6, Math.min(top, rect.height - panelHEstimate - 6));
+  panel.style.left = left + 'px';
+  panel.style.top = top + 'px';
 }
 
 function updateWaveInfoPanel(comp, completed){
@@ -1617,6 +1960,10 @@ function updateTopbar(){
   const world = WORLDS[state.world];
   document.getElementById('worldIcon').textContent = world.icon;
   document.getElementById('worldVal').textContent = world.name;
+  const diff = DIFFICULTIES[state.difficulty];
+  document.getElementById('diffIcon').textContent = diff.icon;
+  document.getElementById('diffVal').textContent = diff.name;
+  document.getElementById('diffStat').style.color = diff.color;
   document.getElementById('moneyVal').textContent = Math.floor(state.money);
   const waveCap = state.wave > WAVES_PER_WORLD ? `${state.wave} (∞)` : `${state.wave}/${WAVES_PER_WORLD}`;
   document.getElementById('waveVal').textContent = 'Onda ' + waveCap;
@@ -1625,6 +1972,8 @@ function updateTopbar(){
   document.getElementById('healthBarInner').style.width = Math.max(0,(state.health/state.maxHealth*100)) + '%';
   document.getElementById('startWaveBtn').disabled = state.waveActive || state.gameOver;
   updateShopAfford();
+  updateTowerInfoAfford();
+  updateCoinDisplays();
 }
 
 // ---------- WORLD SELECT UI ----------
@@ -1663,10 +2012,128 @@ function hideWorldSelect(){
   document.getElementById('pauseBtn').textContent = '⏸ Pausar';
 }
 
+// ---------- START SCREEN ----------
+function showStartScreen(){
+  state.paused = true;
+  updateCoinDisplays();
+  document.getElementById('startScreen').classList.remove('hidden');
+}
+function hideStartScreen(){
+  document.getElementById('startScreen').classList.add('hidden');
+}
+function beginGameFlow(){
+  state.paused = false;
+  showDifficultySelect();
+}
+
+// ---------- DIFFICULTY SELECT ----------
+function renderDifficultySelect(){
+  const wrap = document.getElementById('difficultyCards');
+  wrap.innerHTML = '';
+  Object.entries(DIFFICULTIES).forEach(([key, d]) => {
+    const card = document.createElement('div');
+    card.className = 'worldCard unlocked';
+    card.style.borderColor = d.color;
+    card.innerHTML = `
+      <div class="icon">${d.icon}</div>
+      <div class="wname" style="color:${d.color}">${d.name}</div>
+      <div class="wmeta">${d.desc}</div>
+      <button class="wbtn" style="background:${d.color};color:#0a0e17">▶ Selecionar</button>
+    `;
+    card.addEventListener('click', () => chooseDifficulty(key));
+    wrap.appendChild(card);
+  });
+}
+function showDifficultySelect(){
+  state.paused = true;
+  renderDifficultySelect();
+  document.getElementById('difficultyOverlay').classList.remove('hidden');
+}
+function hideDifficultySelect(){
+  document.getElementById('difficultyOverlay').classList.add('hidden');
+}
+function chooseDifficulty(key){
+  state.difficulty = key;
+  hideDifficultySelect();
+  if(key === 'extreme'){
+    enterWorld('floresta');
+  } else {
+    let lastWorld = null;
+    try{ lastWorld = localStorage.getItem(LAST_WORLD_KEY); }catch(e){}
+    if(lastWorld && lastWorld !== 'floresta' && meta.unlockedWorlds.includes(lastWorld) && localStorage.getItem(sessionKey(lastWorld, key))){
+      enterWorld(lastWorld);
+    } else {
+      showWorldSelect();
+    }
+  }
+}
+
+// ---------- SHOP (LOJA) ----------
+let shopReturnTo = 'start'; // 'start' or 'game'
+function renderShopScreen(){
+  const wrap = document.getElementById('shopCards');
+  wrap.innerHTML = '';
+  SHOP_TOWER_KEYS.forEach(key => {
+    const t = TOWER_TYPES[key];
+    const owned = meta.unlockedTowers.includes(key);
+    const card = document.createElement('div');
+    card.className = 'shopCard' + (owned ? ' owned' : '');
+    card.innerHTML = `
+      <div class="dot" style="background:${t.color};color:${t.color}"></div>
+      <div class="name">${t.name}</div>
+      <div class="desc">${t.desc}</div>
+      ${owned
+        ? `<div class="owned-tag">✔ Adquirida</div>`
+        : `<div class="price">🪙 ${t.coinCost}</div><button ${meta.coins < t.coinCost ? 'disabled' : ''}>Comprar</button>`
+      }
+    `;
+    if(!owned){
+      const btn = card.querySelector('button');
+      btn.addEventListener('click', () => buyTower(key));
+    }
+    wrap.appendChild(card);
+  });
+}
+function buyTower(key){
+  const t = TOWER_TYPES[key];
+  if(meta.unlockedTowers.includes(key)) return;
+  if(meta.coins < t.coinCost) return;
+  meta.coins -= t.coinCost;
+  meta.unlockedTowers.push(key);
+  saveMeta();
+  renderShopScreen();
+  renderShop(); // refresh in-run tower shop too, in case a session is active
+}
+function openShop(context){
+  shopReturnTo = context;
+  renderShopScreen();
+  updateCoinDisplays();
+  if(context === 'game'){ state.paused = true; }
+  document.getElementById('shopOverlay').classList.remove('hidden');
+}
+function closeShop(){
+  document.getElementById('shopOverlay').classList.add('hidden');
+  if(shopReturnTo === 'start'){
+    showStartScreen();
+  } else {
+    state.paused = false;
+    document.getElementById('pauseBtn').textContent = '⏸ Pausar';
+  }
+}
+
 // ---------- CONTROL BUTTONS ----------
 document.getElementById('startWaveBtn').addEventListener('click', startNextWave);
 document.getElementById('worldsBtn').addEventListener('click', showWorldSelect);
 document.getElementById('closeWorldSelect').addEventListener('click', hideWorldSelect);
+document.getElementById('closeDifficulty').addEventListener('click', () => { hideDifficultySelect(); showStartScreen(); });
+document.getElementById('playBtn').addEventListener('click', () => { hideStartScreen(); beginGameFlow(); });
+document.getElementById('shopBtnStart').addEventListener('click', () => { hideStartScreen(); openShop('start'); });
+document.getElementById('shopBtn').addEventListener('click', () => openShop('game'));
+document.getElementById('closeShop').addEventListener('click', closeShop);
+document.getElementById('homeBtn').addEventListener('click', () => {
+  if(!state.gameOver) saveGame();
+  showStartScreen();
+});
 document.getElementById('autoWaveBtn').addEventListener('click', () => {
   state.autoWave = !state.autoWave;
   document.getElementById('autoWaveBtn').textContent = '🔄 Auto: ' + (state.autoWave ? 'ON' : 'OFF');
@@ -1687,6 +2154,10 @@ document.getElementById('speedBtn').addEventListener('click', () => {
   document.getElementById('speedBtn').textContent = '⏩ ' + state.speed + 'x';
 });
 document.getElementById('saveBtn').addEventListener('click', saveGame);
+document.getElementById('closeFieldPanel').addEventListener('click', () => {
+  state.selectedTower = null;
+  renderTowerInfo();
+});
 document.getElementById('resetBtn').addEventListener('click', () => {
   if(confirm('Reiniciar o progresso deste mundo (dinheiro, torres e ondas)? Seus mundos e torres desbloqueadas não serão perdidos.')){
     freshSessionFields(state.world);
@@ -1734,31 +2205,12 @@ window.addEventListener('beforeunload', () => { if(!state.gameOver) saveGame(); 
 // ---------- INIT ----------
 (function init(){
   meta = loadMeta();
-  let lastWorld = null;
-  try{ lastWorld = localStorage.getItem(LAST_WORLD_KEY); }catch(e){}
-
-  if(lastWorld && meta.unlockedWorlds.includes(lastWorld)){
-    const loaded = loadSession(lastWorld);
-    state.world = lastWorld;
-    if(!loaded) freshSessionFields(lastWorld);
-    renderShop();
-    updateTopbar();
-    renderTowerInfo();
-    if(loaded && state.wave > 0){
-      document.getElementById('waveInfo').innerHTML = `Progresso restaurado — onda <b>${state.wave}</b> concluída. Pressione <b>Iniciar Onda</b> ou aguarde a próxima automática.`;
-    } else {
-      document.getElementById('waveInfo').innerHTML = `Bem-vindo à ${WORLDS[state.world].name}! Ondas automáticas <b>ativadas</b>.`;
-    }
-    if(state.autoWave && !state.waveActive && !state.gameOver){
-      state.autoWaveTimer = state.autoWaveDelay;
-    }
-  } else {
-    freshSessionFields('floresta');
-    renderShop();
-    updateTopbar();
-    renderTowerInfo();
-    showWorldSelect();
-  }
+  freshSessionFields('floresta');
+  renderShop();
+  updateTopbar();
+  renderTowerInfo();
+  updateCoinDisplays();
+  showStartScreen();
 
   requestAnimationFrame(loop);
 })();
